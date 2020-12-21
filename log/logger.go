@@ -35,7 +35,7 @@ type defaultLogger struct {
 func newNilLogger() Logger {
 	d := &defaultLogger{
 		level:  ErrorLevel,
-		logger: log.New(os.Stderr, "[etl]", log.Lmicroseconds|log.LstdFlags|log.Lshortfile),
+		logger: log.New(os.Stderr, "[log]", log.Lmicroseconds|log.LstdFlags|log.Lshortfile),
 	}
 	return d
 }
