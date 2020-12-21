@@ -1,6 +1,6 @@
 module github.com/Breeze0806/go
 
-go 1.15
+go 1.11
 
 require (
 	github.com/tidwall/gjson v1.6.4
