@@ -254,7 +254,7 @@ func (j *Json) Clone() *Json {
 }
 
 func (j *Json) MarshalJSON() ([]byte, error) {
-	return []byte(j.String()), nil
+	return []byte(j.res.Raw), nil
 }
 
 func (j *Json) fromString(s string) {
