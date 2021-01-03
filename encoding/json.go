@@ -154,7 +154,7 @@ func (j *Json) GetMap(path string) (map[string]*Json, error) {
 }
 
 func (j *Json) String() string {
-	return j.res.String()
+	return j.res.Raw
 }
 
 func (j *Json) IsArray(path string) bool {
