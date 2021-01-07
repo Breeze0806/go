@@ -1,4 +1,4 @@
-package pq
+package pqto
 
 import (
 	"context"
