@@ -29,6 +29,7 @@ func init() {
 	sql.Register("pgTimeout", &Driver{})
 }
 
+//Open opens a new connection to the database. name is a connection string.
 func Open(name string) (conn driver.Conn, err error) {
 	conn = nil
 	if strings.HasPrefix(name, "postgres://") || strings.HasPrefix(name, "postgresql://") {

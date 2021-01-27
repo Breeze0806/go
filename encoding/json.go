@@ -9,45 +9,61 @@ import (
 	"github.com/tidwall/sjson"
 )
 
-type Json struct {
+//JSON json格式编码
+type JSON struct {
 	res gjson.Result
 }
 
-func NewJsonFromString(s string) (*Json, error) {
+//NewJSONFromString 从字符串s中获取JSON，该函数会检查格式合法性
+func NewJSONFromString(s string) (*JSON, error) {
 	if !gjson.Valid(s) {
 		return nil, fmt.Errorf("%v is not valid json", s)
 	}
-	return newJsonFromString(s), nil
+	return newJSONFromString(s), nil
 }
 
-func newJsonFromString(s string) *Json {
-	return &Json{
+//NewJSONFromString 从字符串s中获取JSON，该函数不会检查格式合法性
+func newJSONFromString(s string) *JSON {
+	return &JSON{
 		res: gjson.Parse(s),
 	}
 }
 
-func NewJsonFromBytes(b []byte) (*Json, error) {
+//NewJSONFromBytes 从字符流中b中获取JSON，该函数会检查格式合法性
+func NewJSONFromBytes(b []byte) (*JSON, error) {
 	if !gjson.ValidBytes(b) {
 		return nil, fmt.Errorf("%v is not valid json", string(b))
 	}
-	return newJsonFromBytes(b), nil
+	return newJSONFromBytes(b), nil
 }
 
-func newJsonFromBytes(b []byte) *Json {
-	return &Json{
+//newJSONFromBytes 从字符流b中获取JSON，该函数不会检查格式合法性
+func newJSONFromBytes(b []byte) *JSON {
+	return &JSON{
 		res: gjson.ParseBytes(b),
 	}
 }
 
-func NewJsonFromFile(filename string) (*Json, error) {
+//NewJSONFromFile 从文件filename中获取JSON，该函数会检查格式合法性
+func NewJSONFromFile(filename string) (*JSON, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("read file %v fail. err： %v", filename, err)
 	}
-	return NewJsonFromBytes(data)
+	return NewJSONFromBytes(data)
 }
 
-func (j *Json) GetJson(path string) (*Json, error) {
+//GetJSON 获取path路径对应的值JOSN结构,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+//如果path对应的不是json结构或者不存在，就会返回错误
+func (j *JSON) GetJSON(path string) (*JSON, error) {
 	res, err := j.getResult(path)
 	if err != nil {
 		return nil, err
@@ -56,12 +72,22 @@ func (j *Json) GetJson(path string) (*Json, error) {
 		return nil, fmt.Errorf("path(%v) is not json", path)
 	}
 
-	return &Json{
+	return &JSON{
 		res: res,
 	}, nil
 }
 
-func (j *Json) GetBool(path string) (bool, error) {
+//GetBool 获取path路径对应的值bool值,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+//如果path对应的不是bool值或者不存在，就会返回错误
+func (j *JSON) GetBool(path string) (bool, error) {
 	res, err := j.getResult(path)
 	if err != nil {
 		return false, err
@@ -75,7 +101,17 @@ func (j *Json) GetBool(path string) (bool, error) {
 	return false, fmt.Errorf("path(%v) is not bool", path)
 }
 
-func (j *Json) GetInt64(path string) (int64, error) {
+//GetInt64 获取path路径对应的值int64值,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+//如果path对应的不是int64值或者不存在，就会返回错误
+func (j *JSON) GetInt64(path string) (int64, error) {
 	res, err := j.getResult(path)
 	if err != nil {
 		return 0, err
@@ -91,7 +127,17 @@ func (j *Json) GetInt64(path string) (int64, error) {
 	return 0, fmt.Errorf("path(%v) is not bool", path)
 }
 
-func (j *Json) GetFloat64(path string) (float64, error) {
+//GetFloat64 获取path路径对应的值float64值,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+//如果path对应的不是float64值或者不存在，就会返回错误
+func (j *JSON) GetFloat64(path string) (float64, error) {
 	res, err := j.getResult(path)
 	if err != nil {
 		return 0, err
@@ -107,7 +153,17 @@ func (j *Json) GetFloat64(path string) (float64, error) {
 	return 0, fmt.Errorf("path(%v) is not bool", path)
 }
 
-func (j *Json) GetString(path string) (string, error) {
+//GetString 获取path路径对应的值String值,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+//如果path对应的不是String值或者不存在，就会返回错误
+func (j *JSON) GetString(path string) (string, error) {
 	res, err := j.getResult(path)
 	if err != nil {
 		return "", err
@@ -119,57 +175,114 @@ func (j *Json) GetString(path string) (string, error) {
 	return "", fmt.Errorf("path(%v) is not string", path)
 }
 
-func (j *Json) GetArray(path string) ([]*Json, error) {
+//GetArray 获取path路径对应的值数组,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+//如果path对应的不是数组或者不存在，就会返回错误
+func (j *JSON) GetArray(path string) ([]*JSON, error) {
 	res, err := j.getResult(path)
 	if err != nil {
 		return nil, err
 	}
 	switch {
 	case res.IsArray():
-		var jsons []*Json
+		var jsons []*JSON
 		a := res.Array()
 		for _, v := range a {
-			jsons = append(jsons, &Json{res: v})
+			jsons = append(jsons, &JSON{res: v})
 		}
 		return jsons, nil
 	}
 	return nil, fmt.Errorf("path(%v) is not array", path)
 }
 
-func (j *Json) GetMap(path string) (map[string]*Json, error) {
+//GetMap 获取path路径对应的值字符串映射,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+//如果path对应的不是字符串映射或者不存在，就会返回错误
+func (j *JSON) GetMap(path string) (map[string]*JSON, error) {
 	res, err := j.getResult(path)
 	if err != nil {
 		return nil, err
 	}
 	switch {
 	case res.IsObject():
-		jsons := make(map[string]*Json)
+		jsons := make(map[string]*JSON)
 		m := res.Map()
 		for k, v := range m {
-			jsons[k] = &Json{res: v}
+			jsons[k] = &JSON{res: v}
 		}
 		return jsons, nil
 	}
 	return nil, fmt.Errorf("path(%v) is not map", path)
 }
 
-func (j *Json) String() string {
+//String 获取字符串表示
+func (j *JSON) String() string {
 	return j.res.Raw
 }
 
-func (j *Json) IsArray(path string) bool {
+//IsArray 判断path路径对应的值是否是数组,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) IsArray(path string) bool {
 	return j.res.Get(path).IsArray()
 }
 
-func (j *Json) IsNumber(path string) bool {
+//IsNumber 判断path路径对应的值是否是数值,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) IsNumber(path string) bool {
 	return j.res.Get(path).Type == gjson.Number
 }
 
-func (j *Json) IsJson(path string) bool {
+//IsJSON 判断path路径对应的值是否是JSON,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) IsJSON(path string) bool {
 	return j.res.Get(path).IsObject()
 }
 
-func (j *Json) IsBool(path string) bool {
+//IsBool 判断path路径对应的值是否是BOOL,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) IsBool(path string) bool {
 	switch j.res.Get(path).Type {
 	case gjson.False, gjson.True:
 		return true
@@ -177,19 +290,55 @@ func (j *Json) IsBool(path string) bool {
 	return false
 }
 
-func (j *Json) IsString(path string) bool {
+//IsString 判断path路径对应的值是否是字符串,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) IsString(path string) bool {
 	return j.res.Get(path).Type == gjson.String
 }
 
-func (j *Json) IsNull(path string) bool {
+//IsNull 判断path路径对应的值值是否为空,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) IsNull(path string) bool {
 	return j.res.Get(path).Type == gjson.Null
 }
 
-func (j *Json) Exists(path string) bool {
+//Exists 判断path路径对应的值值是否存在,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) Exists(path string) bool {
 	return j.res.Get(path).Exists()
 }
 
-func (j *Json) Set(path string, v interface{}) error {
+//Set 将path路径对应的值设置成v,会返回错误error,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) Set(path string, v interface{}) error {
 	s, err := sjson.Set(j.String(), path, v)
 	if err != nil {
 		return fmt.Errorf("path(%v) set fail. err: %v", path, err)
@@ -198,11 +347,29 @@ func (j *Json) Set(path string, v interface{}) error {
 	return nil
 }
 
-func (j *Json) SetRawBytes(path string, b []byte) error {
+//SetRawBytes 将path路径对应的值设置成b,会返回错误error,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) SetRawBytes(path string, b []byte) error {
 	return j.SetRawString(path, string(b))
 }
 
-func (j *Json) SetRawString(path string, s string) error {
+//SetRawString 将path路径对应的值设置成s,会返回错误error,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) SetRawString(path string, s string) error {
 	ns, err := sjson.SetRaw(j.String(), path, s)
 	if err != nil {
 		return fmt.Errorf("path(%v) set fail. err: %v", path, err)
@@ -211,7 +378,16 @@ func (j *Json) SetRawString(path string, s string) error {
 	return nil
 }
 
-func (j *Json) Remove(path string) error {
+//Remove 将path路径对应的值删除,会返回错误error,对于下列json
+//{
+//  "a":{
+//     "b":[{
+//        c:"x"
+//      }]
+//	}
+//}
+//要访问到x字符串 path每层的访问路径为a,a.b,a.b.0，a.b.0.c
+func (j *JSON) Remove(path string) error {
 	s, err := sjson.Delete(j.String(), path)
 	if err != nil {
 		return fmt.Errorf("path(%v) remove fail. err: %v", path, err)
@@ -220,8 +396,9 @@ func (j *Json) Remove(path string) error {
 	return nil
 }
 
-func (j *Json) FromString(s string) error {
-	new, err := NewJsonFromString(s)
+//FromString 将字符串s设置成JSON,会返回错误error
+func (j *JSON) FromString(s string) error {
+	new, err := NewJSONFromString(s)
 	if err != nil {
 		return err
 	}
@@ -229,8 +406,9 @@ func (j *Json) FromString(s string) error {
 	return nil
 }
 
-func (j *Json) FromBytes(b []byte) error {
-	new, err := NewJsonFromBytes(b)
+//FromBytes 将字节流b设置成JSON,会返回错误error
+func (j *JSON) FromBytes(b []byte) error {
+	new, err := NewJSONFromBytes(b)
 	if err != nil {
 		return err
 	}
@@ -238,8 +416,9 @@ func (j *Json) FromBytes(b []byte) error {
 	return nil
 }
 
-func (j *Json) FromFile(filename string) error {
-	new, err := NewJsonFromFile(filename)
+//FromFile 从文件名为filename的文件中读取JSON,会返回错误error
+func (j *JSON) FromFile(filename string) error {
+	new, err := NewJSONFromFile(filename)
 	if err != nil {
 		return err
 	}
@@ -247,22 +426,24 @@ func (j *Json) FromFile(filename string) error {
 	return nil
 }
 
-func (j *Json) Clone() *Json {
-	return &Json{
+//Clone 克隆JSON
+func (j *JSON) Clone() *JSON {
+	return &JSON{
 		res: j.res,
 	}
 }
 
-func (j *Json) MarshalJSON() ([]byte, error) {
+//MarshalJSON 序列化JSON
+func (j *JSON) MarshalJSON() ([]byte, error) {
 	return []byte(j.res.Raw), nil
 }
 
-func (j *Json) fromString(s string) {
-	new := newJsonFromString(s)
+func (j *JSON) fromString(s string) {
+	new := newJSONFromString(s)
 	j.res = new.res
 }
 
-func (j *Json) getResult(path string) (gjson.Result, error) {
+func (j *JSON) getResult(path string) (gjson.Result, error) {
 	res := j.res.Get(path)
 	if res.Exists() {
 		return res, nil

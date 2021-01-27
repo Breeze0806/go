@@ -124,8 +124,8 @@ var invlaidJSON = `{
 	}
 }`
 
-func testJsonFromString(s string) *Json {
-	return newJsonFromString(s)
+func testJSONFromString(s string) *JSON {
+	return newJSONFromString(s)
 }
 
 func TestNewJsonFromString(t *testing.T) {
@@ -135,7 +135,7 @@ func TestNewJsonFromString(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Json
+		want    *JSON
 		wantErr bool
 	}{
 		{
@@ -150,13 +150,13 @@ func TestNewJsonFromString(t *testing.T) {
 			args: args{
 				s: basicJSON,
 			},
-			want:    testJsonFromString(basicJSON),
+			want:    testJSONFromString(basicJSON),
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewJsonFromString(tt.args.s)
+			got, err := NewJSONFromString(tt.args.s)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewJsonFromString() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -179,7 +179,7 @@ func TestNewJsonFromBytes(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Json
+		want    *JSON
 		wantErr bool
 	}{
 		{
@@ -195,13 +195,13 @@ func TestNewJsonFromBytes(t *testing.T) {
 			args: args{
 				b: []byte(basicJSON),
 			},
-			want:    testJsonFromString(basicJSON),
+			want:    testJSONFromString(basicJSON),
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewJsonFromBytes(tt.args.b)
+			got, err := NewJSONFromBytes(tt.args.b)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewJsonFromBytes() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -224,7 +224,7 @@ func TestNewJsonFromFile(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Json
+		want    *JSON
 		wantErr bool
 	}{
 		{
@@ -239,12 +239,12 @@ func TestNewJsonFromFile(t *testing.T) {
 			args: args{
 				"test_data",
 			},
-			want: testJsonFromString(strings.ReplaceAll(basicJSON, "\n", "\r\n")),
+			want: testJSONFromString(strings.ReplaceAll(basicJSON, "\n", "\r\n")),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewJsonFromFile(tt.args.filename)
+			got, err := NewJSONFromFile(tt.args.filename)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewJsonFromFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -266,18 +266,18 @@ func TestJson_GetJson(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
-		want    *Json
+		want    *JSON
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0",
 			},
-			want: testJsonFromString(`{
+			want: testJSONFromString(`{
 				"firstName": "Brett",
 				"lastName": "McLaughlin",
 				"email": "aaaa",
@@ -288,7 +288,7 @@ func TestJson_GetJson(t *testing.T) {
 
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0.firstName",
 			},
@@ -296,7 +296,7 @@ func TestJson_GetJson(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0.1111",
 			},
@@ -305,9 +305,9 @@ func TestJson_GetJson(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.j.GetJson(tt.args.path)
+			got, err := tt.j.GetJSON(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.GetJson() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.GetJson() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got == nil && tt.want == nil {
@@ -315,7 +315,7 @@ func TestJson_GetJson(t *testing.T) {
 			}
 
 			if got.String() != tt.want.String() {
-				t.Errorf("Json.GetJson() = %#v, want %#v", got, tt.want)
+				t.Errorf("JSON.GetJson() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -327,14 +327,14 @@ func TestJson_GetBool(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    bool
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "happy",
 			},
@@ -343,14 +343,14 @@ func TestJson_GetBool(t *testing.T) {
 
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "immortal",
 			},
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0",
 			},
@@ -358,7 +358,7 @@ func TestJson_GetBool(t *testing.T) {
 		},
 		{
 			name: "4",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0.1111",
 			},
@@ -369,11 +369,11 @@ func TestJson_GetBool(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.j.GetBool(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.GetBool() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.GetBool() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Json.GetBool() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.GetBool() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -385,14 +385,14 @@ func TestJson_GetInt64(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    int64
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "age",
 			},
@@ -400,7 +400,7 @@ func TestJson_GetInt64(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "arr",
 			},
@@ -408,7 +408,7 @@ func TestJson_GetInt64(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstname",
 			},
@@ -416,7 +416,7 @@ func TestJson_GetInt64(t *testing.T) {
 		},
 		{
 			name: "4",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstName",
 			},
@@ -427,11 +427,11 @@ func TestJson_GetInt64(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.j.GetInt64(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.GetInt64() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.GetInt64() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Json.GetInt64() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.GetInt64() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -443,14 +443,14 @@ func TestJson_GetFloat64(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    float64
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstName",
 			},
@@ -458,7 +458,7 @@ func TestJson_GetFloat64(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "arr",
 			},
@@ -466,7 +466,7 @@ func TestJson_GetFloat64(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstname",
 			},
@@ -485,11 +485,11 @@ func TestJson_GetFloat64(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.j.GetFloat64(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.GetFloat64() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.GetFloat64() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Json.GetFloat64() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.GetFloat64() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -501,14 +501,14 @@ func TestJson_GetString(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "name.first",
 			},
@@ -516,7 +516,7 @@ func TestJson_GetString(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "arr",
 			},
@@ -524,7 +524,7 @@ func TestJson_GetString(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstname",
 			},
@@ -535,11 +535,11 @@ func TestJson_GetString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.j.GetString(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.GetString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.GetString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Json.GetString() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.GetString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -551,29 +551,29 @@ func TestJson_GetArray(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
-		want    []*Json
+		want    []*JSON
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "vals",
 			},
-			want: []*Json{
-				testJsonFromString(`1`),
-				testJsonFromString(`2`),
-				testJsonFromString(`3`),
-				testJsonFromString(`{
+			want: []*JSON{
+				testJSONFromString(`1`),
+				testJSONFromString(`2`),
+				testJSONFromString(`3`),
+				testJSONFromString(`{
 		"sadf": "asdf"
 	}`),
 			},
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "name",
 			},
@@ -581,7 +581,7 @@ func TestJson_GetArray(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstname",
 			},
@@ -592,7 +592,7 @@ func TestJson_GetArray(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.j.GetArray(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.GetArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.GetArray() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
@@ -606,7 +606,7 @@ func TestJson_GetArray(t *testing.T) {
 			}
 			return
 		ERROR:
-			t.Errorf("Json.GetArray() = %v, want %v", got, tt.want)
+			t.Errorf("JSON.GetArray() = %v, want %v", got, tt.want)
 
 		})
 	}
@@ -618,25 +618,25 @@ func TestJson_GetMap(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
-		want    map[string]*Json
+		want    map[string]*JSON
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "name",
 			},
-			want: map[string]*Json{
-				"first": testJsonFromString(`"tom"`),
-				"last":  testJsonFromString(`null`),
+			want: map[string]*JSON{
+				"first": testJSONFromString(`"tom"`),
+				"last":  testJSONFromString(`null`),
 			},
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "vals",
 			},
@@ -644,7 +644,7 @@ func TestJson_GetMap(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstname",
 			},
@@ -655,11 +655,11 @@ func TestJson_GetMap(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.j.GetMap(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.GetMap() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.GetMap() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Json.GetMap() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.GetMap() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -671,13 +671,13 @@ func TestJson_IsArray(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		j    *Json
+		j    *JSON
 		args args
 		want bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "vals",
 			},
@@ -685,7 +685,7 @@ func TestJson_IsArray(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "name",
 			},
@@ -695,7 +695,7 @@ func TestJson_IsArray(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.j.IsArray(tt.args.path); got != tt.want {
-				t.Errorf("Json.IsArray() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.IsArray() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -707,13 +707,13 @@ func TestJson_IsNumber(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		j    *Json
+		j    *JSON
 		args args
 		want bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.3.firstName",
 			},
@@ -721,7 +721,7 @@ func TestJson_IsNumber(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "arr",
 			},
@@ -731,7 +731,7 @@ func TestJson_IsNumber(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.j.IsNumber(tt.args.path); got != tt.want {
-				t.Errorf("Json.IsNumber() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.IsNumber() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -743,13 +743,13 @@ func TestJson_IsJson(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		j    *Json
+		j    *JSON
 		args args
 		want bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0",
 			},
@@ -758,7 +758,7 @@ func TestJson_IsJson(t *testing.T) {
 
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0.firstName",
 			},
@@ -767,8 +767,8 @@ func TestJson_IsJson(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.j.IsJson(tt.args.path); got != tt.want {
-				t.Errorf("Json.IsJson() = %v, want %v", got, tt.want)
+			if got := tt.j.IsJSON(tt.args.path); got != tt.want {
+				t.Errorf("JSON.IsJson() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -780,13 +780,13 @@ func TestJson_IsBool(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		j    *Json
+		j    *JSON
 		args args
 		want bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "happy",
 			},
@@ -795,7 +795,7 @@ func TestJson_IsBool(t *testing.T) {
 
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "immortal",
 			},
@@ -803,7 +803,7 @@ func TestJson_IsBool(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "loggy.programmers.0",
 			},
@@ -813,7 +813,7 @@ func TestJson_IsBool(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.j.IsBool(tt.args.path); got != tt.want {
-				t.Errorf("Json.IsBool() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.IsBool() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -825,13 +825,13 @@ func TestJson_IsString(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		j    *Json
+		j    *JSON
 		args args
 		want bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "name.first",
 			},
@@ -839,7 +839,7 @@ func TestJson_IsString(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "arr",
 			},
@@ -849,7 +849,7 @@ func TestJson_IsString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.j.IsString(tt.args.path); got != tt.want {
-				t.Errorf("Json.IsString() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.IsString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -861,13 +861,13 @@ func TestJson_IsNull(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		j    *Json
+		j    *JSON
 		args args
 		want bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "name.last",
 			},
@@ -875,7 +875,7 @@ func TestJson_IsNull(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "arr",
 			},
@@ -885,7 +885,7 @@ func TestJson_IsNull(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.j.IsNull(tt.args.path); got != tt.want {
-				t.Errorf("Json.IsNull() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.IsNull() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -897,13 +897,13 @@ func TestJson_Exists(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		j    *Json
+		j    *JSON
 		args args
 		want bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "name.last",
 			},
@@ -911,7 +911,7 @@ func TestJson_Exists(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			args: args{
 				path: "arr.100",
 			},
@@ -921,7 +921,7 @@ func TestJson_Exists(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.j.Exists(tt.args.path); got != tt.want {
-				t.Errorf("Json.Exists() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.Exists() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -934,14 +934,14 @@ func TestJson_Set(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first",
 				v:    nil,
@@ -951,7 +951,7 @@ func TestJson_Set(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first.1",
 				v:    nil,
@@ -961,7 +961,7 @@ func TestJson_Set(t *testing.T) {
 		},
 		{
 			name: "3",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first.*",
 				v:    nil,
@@ -973,7 +973,7 @@ func TestJson_Set(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.j.Set(tt.args.path, tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("Json.Set() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.Set() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.j.String() != tt.want {
@@ -990,14 +990,14 @@ func TestJson_SetRawBytes(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first",
 				b:    []byte(`[1,2,3,4,5,67]`),
@@ -1007,7 +1007,7 @@ func TestJson_SetRawBytes(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first.*",
 				b:    []byte("1"),
@@ -1019,7 +1019,7 @@ func TestJson_SetRawBytes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.j.SetRawBytes(tt.args.path, tt.args.b); (err != nil) != tt.wantErr {
-				t.Errorf("Json.SetRawBytes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.SetRawBytes() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.j.String() != tt.want {
@@ -1036,14 +1036,14 @@ func TestJson_SetRawString(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first",
 				s:    `[1,2,3,4,5,67]`,
@@ -1053,7 +1053,7 @@ func TestJson_SetRawString(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first.*",
 				s:    "1",
@@ -1065,7 +1065,7 @@ func TestJson_SetRawString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.j.SetRawString(tt.args.path, tt.args.s); (err != nil) != tt.wantErr {
-				t.Errorf("Json.SetRawString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.SetRawString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.j.String() != tt.want {
@@ -1081,14 +1081,14 @@ func TestJson_Remove(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name",
 			},
@@ -1097,7 +1097,7 @@ func TestJson_Remove(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    testJsonFromString(`{"name":"x"}`),
+			j:    testJSONFromString(`{"name":"x"}`),
 			args: args{
 				path: "name.first.*",
 			},
@@ -1108,7 +1108,7 @@ func TestJson_Remove(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.j.Remove(tt.args.path); (err != nil) != tt.wantErr {
-				t.Errorf("Json.Remove() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.Remove() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.j.String() != tt.want {
@@ -1124,14 +1124,14 @@ func TestJson_FromString(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    &Json{},
+			j:    &JSON{},
 			args: args{
 				s: invlaidJSON,
 			},
@@ -1140,7 +1140,7 @@ func TestJson_FromString(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    &Json{},
+			j:    &JSON{},
 			args: args{
 				s: basicJSON,
 			},
@@ -1151,7 +1151,7 @@ func TestJson_FromString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.j.FromString(tt.args.s); (err != nil) != tt.wantErr {
-				t.Errorf("Json.FromString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.FromString() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.j.String() != tt.want {
 				t.Errorf("j.String() %v, want %v", tt.j, tt.want)
@@ -1166,14 +1166,14 @@ func TestJson_FromBytes(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    &Json{},
+			j:    &JSON{},
 			args: args{
 				b: []byte(invlaidJSON),
 			},
@@ -1182,7 +1182,7 @@ func TestJson_FromBytes(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    &Json{},
+			j:    &JSON{},
 			args: args{
 				b: []byte(basicJSON),
 			},
@@ -1193,7 +1193,7 @@ func TestJson_FromBytes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.j.FromBytes(tt.args.b); (err != nil) != tt.wantErr {
-				t.Errorf("Json.FromBytes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.FromBytes() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.j.String() != tt.want {
@@ -1209,14 +1209,14 @@ func TestJson_FromFile(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    &Json{},
+			j:    &JSON{},
 			args: args{
 				"1213231k3j21kl3.dadsadasda",
 			},
@@ -1225,7 +1225,7 @@ func TestJson_FromFile(t *testing.T) {
 		},
 		{
 			name: "2",
-			j:    &Json{},
+			j:    &JSON{},
 			args: args{
 				"test_data",
 			},
@@ -1235,7 +1235,7 @@ func TestJson_FromFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.j.FromFile(tt.args.filename); (err != nil) != tt.wantErr {
-				t.Errorf("Json.FromFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.FromFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.j.String() != tt.want {
@@ -1248,24 +1248,24 @@ func TestJson_FromFile(t *testing.T) {
 func TestJson_Clone(t *testing.T) {
 	tests := []struct {
 		name string
-		j    *Json
-		want *Json
+		j    *JSON
+		want *JSON
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
-			want: testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
+			want: testJSONFromString(basicJSON),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.j.Clone()
 			if got == tt.j {
-				t.Errorf("Json.Clone() = %p, j %p", got, tt.want)
+				t.Errorf("JSON.Clone() = %p, j %p", got, tt.want)
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Json.Clone() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.Clone() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -1274,13 +1274,13 @@ func TestJson_Clone(t *testing.T) {
 func TestJson_MarshalJSON(t *testing.T) {
 	tests := []struct {
 		name    string
-		j       *Json
+		j       *JSON
 		want    []byte
 		wantErr bool
 	}{
 		{
 			name: "1",
-			j:    testJsonFromString(basicJSON),
+			j:    testJSONFromString(basicJSON),
 			want: []byte(basicJSON),
 		},
 	}
@@ -1288,24 +1288,24 @@ func TestJson_MarshalJSON(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.j.MarshalJSON()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Json.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("JSON.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Json.MarshalJSON() = %v, want %v", got, tt.want)
+				t.Errorf("JSON.MarshalJSON() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 
-	testJson := struct {
-		MyJson *Json `json:"myJson"`
-		Age    int   `json:"age"`
+	testJSON := struct {
+		MyJSON *JSON `JSON:"myJson"`
+		Age    int   `JSON:"age"`
 	}{
-		MyJson: testJsonFromString(basicJSON),
+		MyJSON: testJSONFromString(basicJSON),
 		Age:    11,
 	}
 
-	b, err := json.Marshal(testJson)
+	b, err := json.Marshal(testJSON)
 	if err != nil {
 		t.Error(err)
 	}

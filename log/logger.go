@@ -17,18 +17,18 @@ type Logger interface {
 	Printf(format string, v ...interface{}) //打印错误日志
 }
 
-//LogLevel 日志级别, 为调试/信息/错误
-type LogLevel uint8
+//Level 日志级别, 为调试/信息/错误
+type Level uint8
 
 //日志级别
 const (
-	DebugLevel LogLevel = iota //调试
-	InfoLevel                  //信息
-	ErrorLevel                 //错误
+	DebugLevel Level = iota //调试
+	InfoLevel               //信息
+	ErrorLevel              //错误
 )
 
 type defaultLogger struct {
-	level  LogLevel
+	level  Level
 	logger *log.Logger
 }
 
@@ -41,7 +41,7 @@ func newNilLogger() Logger {
 }
 
 //NewDefaultLogger 生成一个日志打印Logger，level可以是DebugLevel，InfoLevel，ErrorLevel
-func NewDefaultLogger(writer io.Writer, level LogLevel, prefix string) Logger {
+func NewDefaultLogger(writer io.Writer, level Level, prefix string) Logger {
 	d := &defaultLogger{
 		level:  level,
 		logger: log.New(writer, prefix, log.Lmicroseconds|log.LstdFlags|log.Lshortfile),
@@ -49,28 +49,33 @@ func NewDefaultLogger(writer io.Writer, level LogLevel, prefix string) Logger {
 	return d
 }
 
+//Errorf 错误日志打印
 func (d *defaultLogger) Errorf(format string, args ...interface{}) {
 	if d.level <= ErrorLevel {
 		d.logger.Output(2, fmt.Sprintf(format, args...))
 	}
 }
 
+//Infof 进程日志打印
 func (d *defaultLogger) Infof(format string, args ...interface{}) {
 	if d.level <= InfoLevel {
 		d.logger.Output(2, fmt.Sprintf(format, args...))
 	}
 }
 
+//Debugf 进程日志打印
 func (d *defaultLogger) Debugf(format string, args ...interface{}) {
 	if d.level <= DebugLevel {
 		d.logger.Output(2, fmt.Sprintf(format, args...))
 	}
 }
 
+//Print 日志打印
 func (d *defaultLogger) Print(args ...interface{}) {
 	d.logger.Output(2, fmt.Sprint(args...))
 }
 
+//Printf 日志打印
 func (d *defaultLogger) Printf(format string, v ...interface{}) {
 	d.logger.Output(2, fmt.Sprintf(format, v...))
 }
@@ -118,16 +123,18 @@ func (l *loggerWrapper) logger() Logger {
 	return l.l
 }
 
-//SetLogger 设置一个符合Logger日志来打印调试信息
+//SetLogger 设置一个符合Logger日志来打印调试信息，并且执行所有的日志初始化函数
 func SetLogger(logger Logger) {
 	lw.setLogger(logger)
 	lfuns.doAllFuns()
 }
 
+//GetLogger 获取日志答应句柄
 func GetLogger() Logger {
 	return lw.logger()
 }
 
+//RegisterInitFuncs 注册获取初始化函数
 func RegisterInitFuncs(f func()) {
 	lfuns.append(f)
 }
