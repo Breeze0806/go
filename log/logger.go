@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -35,7 +36,7 @@ type defaultLogger struct {
 func newNilLogger() Logger {
 	d := &defaultLogger{
 		level:  ErrorLevel,
-		logger: log.New(os.Stderr, "[log]", log.Lmicroseconds|log.LstdFlags|log.Lshortfile),
+		logger: log.New(os.Stderr, "[log]", log.Lmicroseconds|log.LstdFlags|log.Llongfile),
 	}
 	return d
 }
@@ -44,7 +45,7 @@ func newNilLogger() Logger {
 func NewDefaultLogger(writer io.Writer, level Level, prefix string) Logger {
 	d := &defaultLogger{
 		level:  level,
-		logger: log.New(writer, prefix, log.Lmicroseconds|log.LstdFlags|log.Lshortfile),
+		logger: log.New(writer, prefix, log.Lmicroseconds|log.LstdFlags|log.Llongfile),
 	}
 	return d
 }
@@ -52,21 +53,30 @@ func NewDefaultLogger(writer io.Writer, level Level, prefix string) Logger {
 //Errorf 错误日志打印
 func (d *defaultLogger) Errorf(format string, args ...interface{}) {
 	if d.level <= ErrorLevel {
-		d.logger.Output(2, fmt.Sprintf(format, args...))
+		b := &strings.Builder{}
+		b.WriteString("[ERROR] ")
+		b.WriteString(fmt.Sprintf(format, args...))
+		d.logger.Output(2, b.String())
 	}
 }
 
 //Infof 进程日志打印
 func (d *defaultLogger) Infof(format string, args ...interface{}) {
 	if d.level <= InfoLevel {
-		d.logger.Output(2, fmt.Sprintf(format, args...))
+		b := &strings.Builder{}
+		b.WriteString("[INFO] ")
+		b.WriteString(fmt.Sprintf(format, args...))
+		d.logger.Output(2, b.String())
 	}
 }
 
 //Debugf 进程日志打印
 func (d *defaultLogger) Debugf(format string, args ...interface{}) {
 	if d.level <= DebugLevel {
-		d.logger.Output(2, fmt.Sprintf(format, args...))
+		b := &strings.Builder{}
+		b.WriteString("[DEBUG] ")
+		b.WriteString(fmt.Sprintf(format, args...))
+		d.logger.Output(2, b.String())
 	}
 }
 

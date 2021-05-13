@@ -27,26 +27,30 @@ func (m *mockWriter) Write(p []byte) (n int, err error) {
 
 func TestNewDefaultLogger(t *testing.T) {
 	buf := bytes.NewBuffer(nil)
-	SetLogger(NewDefaultLogger(newMockWriter(buf), DebugLevel, "datax"))
+	SetLogger(NewDefaultLogger(newMockWriter(buf), DebugLevel, "[datax]"))
 	testCases := []struct {
-		printf func(string, ...interface{})
-		format string
-		args   []interface{}
+		printf     func(string, ...interface{})
+		format     string
+		wantFormat string
+		args       []interface{}
 	}{
 		{
-			printf: GetLogger().Debugf,
-			format: "debug %d",
-			args:   []interface{}{DebugLevel},
+			printf:     GetLogger().Debugf,
+			format:     "debug %d",
+			wantFormat: "[DEBUG] debug %d",
+			args:       []interface{}{DebugLevel},
 		},
 		{
-			printf: GetLogger().Infof,
-			format: "info %d",
-			args:   []interface{}{InfoLevel},
+			printf:     GetLogger().Infof,
+			format:     "info %d",
+			wantFormat: "[INFO] info %d",
+			args:       []interface{}{InfoLevel},
 		},
 		{
-			printf: GetLogger().Errorf,
-			format: "error %d",
-			args:   []interface{}{ErrorLevel},
+			printf:     GetLogger().Errorf,
+			format:     "error %d",
+			wantFormat: "[ERROR] error %d",
+			args:       []interface{}{ErrorLevel},
 		},
 	}
 
@@ -56,8 +60,8 @@ func TestNewDefaultLogger(t *testing.T) {
 		a := strings.Split(buf.String(), ": ")
 		out := a[len(a)-1]
 		out = out[:len(out)-1]
-		want := fmt.Sprintf(v.format, v.args...)
-
+		want := fmt.Sprintf(v.wantFormat, v.args...)
+		fmt.Println(buf.String())
 		if want != out {
 			t.Fatalf("want != out want: %v[%v] out: %v[%v] log: %v.", want, len(want), out, len(out), buf.String())
 		}
