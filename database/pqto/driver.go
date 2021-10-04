@@ -39,17 +39,17 @@ func Open(name string) (conn driver.Conn, err error) {
 		}
 	}
 
-	var o values
+	o := make(values)
 	if err = parseOpts(name, o); err != nil {
 		return
 	}
 
 	var readTimeout, writeTimeout time.Duration
 	if readTimeout, err = time.ParseDuration(o["read_timeout"]); err != nil {
-		return
+		err = nil
 	}
 	if writeTimeout, err = time.ParseDuration(o["write_timeout"]); err != nil {
-		return
+		err = nil
 	}
 	return pq.DialOpen(newDialer(readTimeout, writeTimeout), name)
 }
