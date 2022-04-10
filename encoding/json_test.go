@@ -658,8 +658,20 @@ func TestJson_GetMap(t *testing.T) {
 				t.Errorf("JSON.GetMap() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if tt.wantErr {
+				return
+			}
+
+			if len(got) != len(tt.want) {
 				t.Errorf("JSON.GetMap() = %v, want %v", got, tt.want)
+				return
+			}
+
+			for k := range got {
+				if got[k].String() != tt.want[k].String() {
+					t.Errorf("JSON.GetMap() = %v, want %v", got, tt.want)
+					return
+				}
 			}
 		})
 	}
@@ -967,7 +979,7 @@ func TestJson_Set(t *testing.T) {
 				v:    nil,
 			},
 			want:    `{"name":"x"}`,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -1013,7 +1025,7 @@ func TestJson_SetRawBytes(t *testing.T) {
 				b:    []byte("1"),
 			},
 			want:    `{"name":"x"}`,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -1059,7 +1071,7 @@ func TestJson_SetRawString(t *testing.T) {
 				s:    "1",
 			},
 			want:    `{"name":"x"}`,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
