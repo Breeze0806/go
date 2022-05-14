@@ -1,12 +1,17 @@
 package encoding
 
 import (
-	"fmt"
 	"io/ioutil"
 	"strconv"
 
+	"github.com/pingcap/errors"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
+)
+
+var (
+	//ErrJSONNotValid 不是合法的json
+	ErrJSONNotValid = errors.NewNoStackError("json is not valid")
 )
 
 //JSON json格式编码
@@ -17,7 +22,7 @@ type JSON struct {
 //NewJSONFromString 从字符串s中获取JSON，该函数会检查格式合法性
 func NewJSONFromString(s string) (*JSON, error) {
 	if !gjson.Valid(s) {
-		return nil, fmt.Errorf("%v is not valid json", s)
+		return nil, errors.Wrapf(ErrJSONNotValid, "json: %v", s)
 	}
 	return newJSONFromString(s), nil
 }
@@ -32,7 +37,7 @@ func newJSONFromString(s string) *JSON {
 //NewJSONFromBytes 从字符流中b中获取JSON，该函数会检查格式合法性
 func NewJSONFromBytes(b []byte) (*JSON, error) {
 	if !gjson.ValidBytes(b) {
-		return nil, fmt.Errorf("%v is not valid json", string(b))
+		return nil, errors.Wrapf(ErrJSONNotValid, "json: %v", string(b))
 	}
 	return newJSONFromBytes(b), nil
 }
@@ -48,7 +53,7 @@ func newJSONFromBytes(b []byte) *JSON {
 func NewJSONFromFile(filename string) (*JSON, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return nil, fmt.Errorf("read file %v fail. err： %v", filename, err)
+		return nil, errors.Wrapf(err, "read file %v fail.", filename)
 	}
 	return NewJSONFromBytes(data)
 }
@@ -66,10 +71,10 @@ func NewJSONFromFile(filename string) (*JSON, error) {
 func (j *JSON) GetJSON(path string) (*JSON, error) {
 	res, err := j.getResult(path)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "getResult(%v) fail.", path)
 	}
 	if res.Type != gjson.JSON {
-		return nil, fmt.Errorf("path(%v) is not json", path)
+		return nil, errors.Errorf("path(%v) is not json", path)
 	}
 
 	return &JSON{
@@ -90,7 +95,7 @@ func (j *JSON) GetJSON(path string) (*JSON, error) {
 func (j *JSON) GetBool(path string) (bool, error) {
 	res, err := j.getResult(path)
 	if err != nil {
-		return false, err
+		return false, errors.Wrapf(err, "getResult(%v) fail.", path)
 	}
 	switch res.Type {
 	case gjson.False:
@@ -98,7 +103,7 @@ func (j *JSON) GetBool(path string) (bool, error) {
 	case gjson.True:
 		return true, nil
 	}
-	return false, fmt.Errorf("path(%v) is not bool", path)
+	return false, errors.Errorf("path(%v) is not bool", path)
 }
 
 //GetInt64 获取path路径对应的值int64值,对于下列json
@@ -114,17 +119,17 @@ func (j *JSON) GetBool(path string) (bool, error) {
 func (j *JSON) GetInt64(path string) (int64, error) {
 	res, err := j.getResult(path)
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrapf(err, "getResult(%v) fail.", path)
 	}
 	switch res.Type {
 	case gjson.Number:
 		v, err := strconv.ParseInt(res.String(), 10, 64)
 		if err != nil {
-			return 0, fmt.Errorf("path(%v) is not int64. val: %v", res.String(), err)
+			return 0, errors.Wrapf(err, "path(%v) is not int64. val: %v", path, res.String())
 		}
 		return v, nil
 	}
-	return 0, fmt.Errorf("path(%v) is not bool", path)
+	return 0, errors.Errorf("path(%v) is not bool", path)
 }
 
 //GetFloat64 获取path路径对应的值float64值,对于下列json
@@ -140,17 +145,17 @@ func (j *JSON) GetInt64(path string) (int64, error) {
 func (j *JSON) GetFloat64(path string) (float64, error) {
 	res, err := j.getResult(path)
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrapf(err, "getResult(%v) fail.", path)
 	}
 	switch res.Type {
 	case gjson.Number:
 		v, err := strconv.ParseFloat(res.String(), 64)
 		if err != nil {
-			return 0, fmt.Errorf("path(%v) is not float64. val: %v", res.String(), err)
+			return 0, errors.Wrapf(err, "path(%v) is not float64. val: %v", path, res.String())
 		}
 		return v, nil
 	}
-	return 0, fmt.Errorf("path(%v) is not bool", path)
+	return 0, errors.Errorf("path(%v) is not bool", path)
 }
 
 //GetString 获取path路径对应的值String值,对于下列json
@@ -166,13 +171,13 @@ func (j *JSON) GetFloat64(path string) (float64, error) {
 func (j *JSON) GetString(path string) (string, error) {
 	res, err := j.getResult(path)
 	if err != nil {
-		return "", err
+		return "", errors.Wrapf(err, "getResult(%v) fail.", path)
 	}
 	switch res.Type {
 	case gjson.String:
 		return res.String(), nil
 	}
-	return "", fmt.Errorf("path(%v) is not string", path)
+	return "", errors.Errorf("path(%v) is not string", path)
 }
 
 //GetArray 获取path路径对应的值数组,对于下列json
@@ -188,7 +193,7 @@ func (j *JSON) GetString(path string) (string, error) {
 func (j *JSON) GetArray(path string) ([]*JSON, error) {
 	res, err := j.getResult(path)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "getResult(%v) fail.", path)
 	}
 	switch {
 	case res.IsArray():
@@ -199,7 +204,7 @@ func (j *JSON) GetArray(path string) ([]*JSON, error) {
 		}
 		return jsons, nil
 	}
-	return nil, fmt.Errorf("path(%v) is not array", path)
+	return nil, errors.Errorf("path(%v) is not array", path)
 }
 
 //GetMap 获取path路径对应的值字符串映射,对于下列json
@@ -215,7 +220,7 @@ func (j *JSON) GetArray(path string) ([]*JSON, error) {
 func (j *JSON) GetMap(path string) (map[string]*JSON, error) {
 	res, err := j.getResult(path)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "getResult(%v) fail.", path)
 	}
 	switch {
 	case res.IsObject():
@@ -226,7 +231,7 @@ func (j *JSON) GetMap(path string) (map[string]*JSON, error) {
 		}
 		return jsons, nil
 	}
-	return nil, fmt.Errorf("path(%v) is not map", path)
+	return nil, errors.Errorf("path(%v) is not map", path)
 }
 
 //String 获取字符串表示
@@ -341,7 +346,7 @@ func (j *JSON) Exists(path string) bool {
 func (j *JSON) Set(path string, v interface{}) error {
 	s, err := sjson.Set(j.String(), path, v)
 	if err != nil {
-		return fmt.Errorf("path(%v) set fail. err: %v", path, err)
+		return errors.Wrapf(err, "path(%v) set fail. val: %v", path, v)
 	}
 	j.fromString(s)
 	return nil
@@ -372,7 +377,7 @@ func (j *JSON) SetRawBytes(path string, b []byte) error {
 func (j *JSON) SetRawString(path string, s string) error {
 	ns, err := sjson.SetRaw(j.String(), path, s)
 	if err != nil {
-		return fmt.Errorf("path(%v) set fail. err: %v", path, err)
+		return errors.Wrapf(err, "path(%v) set fail. val: %v", path, s)
 	}
 	j.fromString(ns)
 	return nil
@@ -390,7 +395,7 @@ func (j *JSON) SetRawString(path string, s string) error {
 func (j *JSON) Remove(path string) error {
 	s, err := sjson.Delete(j.String(), path)
 	if err != nil {
-		return fmt.Errorf("path(%v) remove fail. err: %v", path, err)
+		return errors.Wrapf(err, "path(%v) remove fail.", path)
 	}
 	j.fromString(s)
 	return nil
@@ -448,5 +453,5 @@ func (j *JSON) getResult(path string) (gjson.Result, error) {
 	if res.Exists() {
 		return res, nil
 	}
-	return gjson.Result{}, fmt.Errorf("path(%v) does not exist", path)
+	return gjson.Result{}, errors.Errorf("path(%v) does not exist", path)
 }

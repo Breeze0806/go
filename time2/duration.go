@@ -1,8 +1,9 @@
 package time2
 
 import (
-	"errors"
 	"time"
+
+	"github.com/pingcap/errors"
 )
 
 //Duration  持续时间，是time.Duration的封装
