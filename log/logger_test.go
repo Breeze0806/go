@@ -47,6 +47,12 @@ func TestNewDefaultLogger(t *testing.T) {
 			args:       []interface{}{InfoLevel},
 		},
 		{
+			printf:     GetLogger().Warnf,
+			format:     "warn %d",
+			wantFormat: "[WARN] warn %d",
+			args:       []interface{}{WarnLevel},
+		},
+		{
 			printf:     GetLogger().Errorf,
 			format:     "error %d",
 			wantFormat: "[ERROR] error %d",
