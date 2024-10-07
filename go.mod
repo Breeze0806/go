@@ -1,11 +1,11 @@
 module github.com/Breeze0806/go
 
-go 1.19
+go 1.20
 
 require (
 	github.com/lib/pq v1.10.9
 	github.com/pingcap/errors v0.11.4
-	github.com/tidwall/gjson v1.17.1
+	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/sjson v1.2.5
 	github.com/tjfoc/gmsm v1.4.1
 )
